@@ -358,8 +358,8 @@ GNU General Public License for more details.
 
 ### Desenvolvido por
 **Agência Tektus**
-- 🌐 Website: [tektus.com.br](https://tektus.com.br)
-- 📧 Email: contato@tektus.com.br
+- 🌐 Website: [agenciatektus.com.br](https://agenciatektus.com.br)
+- 📧 Email: contato@agenciatektus.com.br
 
 ### Integração
 Plataforma **Kombo** - Sistema de recrutamento e seleção
