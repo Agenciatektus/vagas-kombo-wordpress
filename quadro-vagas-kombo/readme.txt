@@ -1,14 +1,15 @@
 === Quadro de Vagas Kombo ===
-Contributors: valorhconsultoria
-Tags: vagas, empregos, kombo, rh, elementor, trabalhe conosco, curriculo
+Contributors: agenciatektus
+Donate link: https://agenciatektus.com.br
+Tags: vagas, empregos, kombo, rh, elementor, trabalhe conosco, curriculo, recrutamento
 Requires at least: 6.0
-Tested up to: 6.4
+Tested up to: 6.9
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Exibe vagas de emprego do Kombo.com.br atraves de um widget Elementor personalizado.
+Integre vagas de emprego do Kombo.com.br no seu site WordPress com widget Elementor personalizavel e responsivo.
 
 == Description ==
 
@@ -19,10 +20,13 @@ O plugin **Quadro de Vagas Kombo** permite integrar facilmente as vagas de empre
 * **Widget Elementor Completo**: Arraste e solte para adicionar o quadro de vagas em qualquer pagina
 * **3 Layouts Disponiveis**: Grid (cards), Lista e Accordion
 * **Totalmente Responsivo**: Adaptacao automatica para desktop, tablet e mobile
-* **Personalizacao Visual**: Controles completos de cores, tipografia, espacamento e estilos
-* **Cache Inteligente**: Sistema de cache para melhor performance
-* **Acessibilidade**: Suporte a navegacao por teclado e leitores de tela
-* **Identidade Visual**: Cores e estilos alinhados a identidade ValorH
+* **Personalizacao Visual Completa**: Controles de cores, tipografia, espacamento, bordas e estilos
+* **Filtros Avancados**: Filtre vagas por localizacao, area, numero de vagas e data de abertura
+* **Cache Inteligente**: Sistema de cache configuravel para melhor performance
+* **Acessibilidade**: Suporte a navegacao por teclado e leitores de tela (ARIA)
+* **Atualizacao Automatica**: Sistema integrado de atualizacoes via GitHub
+* **Encoding UTF-8**: Tratamento automatico de caracteres especiais e acentuacao
+* **Sem Dependencias Externas**: Codigo leve e otimizado
 
 = Requisitos =
 
@@ -78,12 +82,18 @@ Sim, voce pode adicionar multiplos widgets com diferentes configuracoes ou CIDs 
 
 == Changelog ==
 
-= 1.0.0 =
+= 1.0.0 - 2024-01-29 =
 * Lancamento inicial
 * Widget Elementor com 3 layouts (Grid, Lista, Accordion)
-* Sistema de cache com Transients API
-* Controles completos de estilo
-* Suporte a acessibilidade
+* Sistema de cache com WordPress Transients API
+* Controles completos de estilo e personalizacao
+* Controles de borda (espessura 4 lados e cor)
+* Filtros avancados (localizacao, area, vagas minimas, data)
+* Correcao automatica de encoding UTF-8
+* Limpeza de HTML nas descricoes
+* Sistema de atualizacao automatica via GitHub
+* Suporte completo a acessibilidade (ARIA, navegacao por teclado)
+* Design responsivo para todos os dispositivos
 
 == Upgrade Notice ==
 
@@ -94,12 +104,16 @@ Versao inicial do plugin.
 
 = Suporte =
 
-Para suporte relacionado ao plugin, entre em contato atraves do site da ValorH Consultoria.
+Para suporte relacionado ao plugin:
+* GitHub: https://github.com/Agenciatektus/vagas-kombo-wordpress
+* Website: https://agenciatektus.com.br
+* Email: contato@agenciatektus.com.br
 
 Para suporte relacionado a plataforma Kombo:
 * Telefone: (48) 3374-4373
 * Email: suportecliente@kombo.com.br
+* Site: https://www.kombo.com.br
 
 = Creditos =
 
-Desenvolvido por ValorH Consultoria para integracao com a plataforma Kombo.com.br.
+Desenvolvido por Agencia Tektus para integracao com a plataforma Kombo.com.br - Sistema de recrutamento e selecao online.
