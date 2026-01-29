@@ -121,6 +121,23 @@ final class Quadro_Vagas_Kombo {
     private function load_dependencies() {
         require_once KOMBO_VAGAS_PLUGIN_DIR . 'includes/class-kombo-cache.php';
         require_once KOMBO_VAGAS_PLUGIN_DIR . 'includes/class-kombo-api.php';
+        require_once KOMBO_VAGAS_PLUGIN_DIR . 'includes/class-kombo-updater.php';
+
+        // Inicializa sistema de atualizacao automatica
+        $this->init_auto_updater();
+    }
+
+    /**
+     * Inicializa sistema de atualizacao automatica via GitHub
+     *
+     * @return void
+     */
+    private function init_auto_updater() {
+        new Kombo_Updater(
+            __FILE__,
+            KOMBO_VAGAS_VERSION,
+            'https://github.com/Agenciatektus/vagas-kombo-wordpress'
+        );
     }
 
     /**
