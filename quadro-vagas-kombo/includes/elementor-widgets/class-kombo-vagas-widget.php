@@ -94,12 +94,14 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
         $this->register_content_controls();
         $this->register_display_controls();
         $this->register_filter_controls();
+        $this->register_frontend_filter_controls();
         $this->register_button_controls();
         $this->register_advanced_controls();
         $this->register_style_card_controls();
         $this->register_style_title_controls();
         $this->register_style_info_controls();
         $this->register_style_button_controls();
+        $this->register_style_filter_controls();
         $this->register_style_spacing_controls();
     }
 
@@ -320,6 +322,96 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
                 'default'     => 0,
                 'min'         => 0,
                 'description' => esc_html__( '0 = sem filtro. Ex: 30 para ultimos 30 dias', 'quadro-vagas-kombo' ),
+            )
+        );
+
+        $this->end_controls_section();
+    }
+
+    /**
+     * Registra controles de filtros frontend (para visitantes)
+     *
+     * @return void
+     */
+    private function register_frontend_filter_controls(): void {
+        $this->start_controls_section(
+            'section_frontend_filters',
+            array(
+                'label' => esc_html__( 'Filtros Interativos (Frontend)', 'quadro-vagas-kombo' ),
+                'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
+            )
+        );
+
+        // Toggle para ativar filtros frontend
+        $this->add_control(
+            'enable_frontend_filters',
+            array(
+                'label'        => esc_html__( 'Ativar Filtros Interativos', 'quadro-vagas-kombo' ),
+                'type'         => \Elementor\Controls_Manager::SWITCHER,
+                'label_on'     => esc_html__( 'Sim', 'quadro-vagas-kombo' ),
+                'label_off'    => esc_html__( 'Nao', 'quadro-vagas-kombo' ),
+                'return_value' => 'yes',
+                'default'      => '',
+                'description'  => esc_html__( 'Exibe campos de filtro acima das vagas para visitantes filtrarem em tempo real', 'quadro-vagas-kombo' ),
+            )
+        );
+
+        // Campos de filtro a exibir
+        $this->add_control(
+            'frontend_filter_fields',
+            array(
+                'label'       => esc_html__( 'Campos de Filtro', 'quadro-vagas-kombo' ),
+                'type'        => \Elementor\Controls_Manager::SELECT2,
+                'multiple'    => true,
+                'options'     => array(
+                    'location' => esc_html__( 'Cidade/Localizacao', 'quadro-vagas-kombo' ),
+                    'area'     => esc_html__( 'Ramo/Area', 'quadro-vagas-kombo' ),
+                ),
+                'default'     => array( 'location', 'area' ),
+                'condition'   => array(
+                    'enable_frontend_filters' => 'yes',
+                ),
+            )
+        );
+
+        // Label localizacao
+        $this->add_control(
+            'filter_label_location',
+            array(
+                'label'       => esc_html__( 'Label - Localizacao', 'quadro-vagas-kombo' ),
+                'type'        => \Elementor\Controls_Manager::TEXT,
+                'default'     => esc_html__( 'Filtrar por cidade', 'quadro-vagas-kombo' ),
+                'condition'   => array(
+                    'enable_frontend_filters' => 'yes',
+                    'frontend_filter_fields'  => 'location',
+                ),
+            )
+        );
+
+        // Label area
+        $this->add_control(
+            'filter_label_area',
+            array(
+                'label'       => esc_html__( 'Label - Ramo/Area', 'quadro-vagas-kombo' ),
+                'type'        => \Elementor\Controls_Manager::TEXT,
+                'default'     => esc_html__( 'Filtrar por area', 'quadro-vagas-kombo' ),
+                'condition'   => array(
+                    'enable_frontend_filters' => 'yes',
+                    'frontend_filter_fields'  => 'area',
+                ),
+            )
+        );
+
+        // Texto botao limpar
+        $this->add_control(
+            'filter_reset_text',
+            array(
+                'label'     => esc_html__( 'Texto do Botao Limpar', 'quadro-vagas-kombo' ),
+                'type'      => \Elementor\Controls_Manager::TEXT,
+                'default'   => esc_html__( 'Limpar Filtros', 'quadro-vagas-kombo' ),
+                'condition' => array(
+                    'enable_frontend_filters' => 'yes',
+                ),
             )
         );
 
@@ -809,6 +901,65 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
     }
 
     /**
+     * Registra controles de estilo dos filtros frontend
+     *
+     * @return void
+     */
+    private function register_style_filter_controls(): void {
+        $this->start_controls_section(
+            'section_style_filters',
+            array(
+                'label'     => esc_html__( 'Filtros Interativos', 'quadro-vagas-kombo' ),
+                'tab'       => \Elementor\Controls_Manager::TAB_STYLE,
+                'condition' => array(
+                    'enable_frontend_filters' => 'yes',
+                ),
+            )
+        );
+
+        // Cor de fundo do container
+        $this->add_control(
+            'filter_background',
+            array(
+                'label'     => esc_html__( 'Cor de Fundo', 'quadro-vagas-kombo' ),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'default'   => '#F5F5F5',
+                'selectors' => array(
+                    '{{WRAPPER}} .kombo-filters-wrapper' => 'background-color: {{VALUE}};',
+                ),
+            )
+        );
+
+        // Cor da borda dos inputs
+        $this->add_control(
+            'filter_input_border_color',
+            array(
+                'label'     => esc_html__( 'Cor da Borda do Campo', 'quadro-vagas-kombo' ),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'default'   => '#CCCCCC',
+                'selectors' => array(
+                    '{{WRAPPER}} .kombo-filter-input' => 'border-color: {{VALUE}};',
+                ),
+            )
+        );
+
+        // Cor do botão limpar
+        $this->add_control(
+            'filter_reset_background',
+            array(
+                'label'     => esc_html__( 'Cor do Botao Limpar', 'quadro-vagas-kombo' ),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'default'   => '#8B1818',
+                'selectors' => array(
+                    '{{WRAPPER}} .kombo-filter-reset' => 'background-color: {{VALUE}};',
+                ),
+            )
+        );
+
+        $this->end_controls_section();
+    }
+
+    /**
      * Registra controles de espacamento
      *
      * @return void
@@ -848,6 +999,108 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
         );
 
         $this->end_controls_section();
+    }
+
+    /**
+     * Renderiza interface de filtros frontend
+     *
+     * @param array $settings Configuracoes do widget
+     * @return void
+     */
+    private function render_frontend_filters( $settings ): void {
+        if ( 'yes' !== $settings['enable_frontend_filters'] ) {
+            return;
+        }
+
+        $filter_fields = isset( $settings['frontend_filter_fields'] ) ? $settings['frontend_filter_fields'] : array();
+        $widget_id     = $this->get_id();
+
+        echo '<div class="kombo-filters-wrapper" role="search" aria-label="' . esc_attr__( 'Filtrar vagas', 'quadro-vagas-kombo' ) . '">';
+        echo '<div class="kombo-filters-container">';
+
+        // Filtro de localização
+        if ( in_array( 'location', $filter_fields, true ) ) {
+            $label = ! empty( $settings['filter_label_location'] )
+                ? $settings['filter_label_location']
+                : __( 'Filtrar por cidade', 'quadro-vagas-kombo' );
+
+            echo '<div class="kombo-filter-field">';
+            echo '<label for="kombo-filter-location-' . esc_attr( $widget_id ) . '" class="kombo-filter-label">';
+            echo esc_html( $label );
+            echo '</label>';
+            echo '<input type="text" ';
+            echo 'id="kombo-filter-location-' . esc_attr( $widget_id ) . '" ';
+            echo 'class="kombo-filter-input kombo-filter-location" ';
+            echo 'placeholder="' . esc_attr( $label ) . '" ';
+            echo 'aria-label="' . esc_attr( $label ) . '" ';
+            echo 'autocomplete="off">';
+            echo '</div>';
+        }
+
+        // Filtro de área
+        if ( in_array( 'area', $filter_fields, true ) ) {
+            $label = ! empty( $settings['filter_label_area'] )
+                ? $settings['filter_label_area']
+                : __( 'Filtrar por area', 'quadro-vagas-kombo' );
+
+            echo '<div class="kombo-filter-field">';
+            echo '<label for="kombo-filter-area-' . esc_attr( $widget_id ) . '" class="kombo-filter-label">';
+            echo esc_html( $label );
+            echo '</label>';
+            echo '<input type="text" ';
+            echo 'id="kombo-filter-area-' . esc_attr( $widget_id ) . '" ';
+            echo 'class="kombo-filter-input kombo-filter-area" ';
+            echo 'placeholder="' . esc_attr( $label ) . '" ';
+            echo 'aria-label="' . esc_attr( $label ) . '" ';
+            echo 'autocomplete="off">';
+            echo '</div>';
+        }
+
+        // Botão Reset
+        $reset_text = ! empty( $settings['filter_reset_text'] )
+            ? $settings['filter_reset_text']
+            : __( 'Limpar Filtros', 'quadro-vagas-kombo' );
+
+        echo '<div class="kombo-filter-field kombo-filter-actions">';
+        echo '<button type="button" class="kombo-filter-reset" aria-label="' . esc_attr( $reset_text ) . '">';
+        echo esc_html( $reset_text );
+        echo '</button>';
+        echo '</div>';
+
+        echo '</div>'; // .kombo-filters-container
+
+        // Contador de resultados
+        echo '<div class="kombo-filter-results" role="status" aria-live="polite">';
+        echo '<span class="kombo-filter-count"></span>';
+        echo '</div>';
+
+        echo '</div>'; // .kombo-filters-wrapper
+    }
+
+    /**
+     * Constroi atributos de dados para filtragem frontend
+     *
+     * @param array $vaga Dados da vaga
+     * @return string Atributos HTML data-*
+     */
+    private function build_filter_data_attributes( $vaga ): string {
+        $attrs = array(
+            'data-location' => ! empty( $vaga['localizacao'] ) ? esc_attr( strtolower( $vaga['localizacao'] ) ) : '',
+            'data-city'     => ! empty( $vaga['cidade'] ) ? esc_attr( strtolower( $vaga['cidade'] ) ) : '',
+            'data-state'    => ! empty( $vaga['estado'] ) ? esc_attr( strtolower( $vaga['estado'] ) ) : '',
+            'data-area'     => ! empty( $vaga['ramo_atividade'] ) ? esc_attr( strtolower( $vaga['ramo_atividade'] ) ) : '',
+        );
+
+        return implode(
+            ' ',
+            array_map(
+                function ( $key, $value ) {
+                    return $key . '="' . $value . '"';
+                },
+                array_keys( $attrs ),
+                $attrs
+            )
+        );
     }
 
     /**
@@ -907,6 +1160,9 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
         }
 
         echo '<div class="' . esc_attr( implode( ' ', $wrapper_classes ) ) . '">';
+
+        // Renderiza filtros frontend se ativados
+        $this->render_frontend_filters( $settings );
 
         switch ( $layout ) {
             case 'lista':
@@ -1008,8 +1264,9 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
 
         foreach ( $vagas as $vaga ) {
             $application_url = $this->get_application_url( $settings, $cid, $vaga, $api );
+            $data_attrs      = $this->build_filter_data_attributes( $vaga );
 
-            echo '<article class="kombo-vaga-card ' . esc_attr( $hover_class ) . '" role="listitem">';
+            echo '<article class="kombo-vaga-card ' . esc_attr( $hover_class ) . '" role="listitem" ' . $data_attrs . '>';
 
             // Titulo
             echo '<h3 class="kombo-vaga-title">' . esc_html( $vaga['titulo'] ) . '</h3>';
@@ -1042,8 +1299,9 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
 
         foreach ( $vagas as $vaga ) {
             $application_url = $this->get_application_url( $settings, $cid, $vaga, $api );
+            $data_attrs      = $this->build_filter_data_attributes( $vaga );
 
-            echo '<div class="kombo-vaga-item" role="listitem">';
+            echo '<div class="kombo-vaga-item" role="listitem" ' . $data_attrs . '>';
 
             echo '<div class="kombo-vaga-content">';
             echo '<h3 class="kombo-vaga-title">' . esc_html( $vaga['titulo'] ) . '</h3>';
@@ -1079,8 +1337,9 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
         foreach ( $vagas as $index => $vaga ) {
             $application_url = $this->get_application_url( $settings, $cid, $vaga, $api );
             $item_id         = $widget_id . '-' . $index;
+            $data_attrs      = $this->build_filter_data_attributes( $vaga );
 
-            echo '<div class="kombo-accordion-item" role="listitem">';
+            echo '<div class="kombo-accordion-item" role="listitem" ' . $data_attrs . '>';
 
             // Cabecalho do accordion
             echo '<button class="kombo-accordion-header" ';

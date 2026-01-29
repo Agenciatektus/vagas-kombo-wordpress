@@ -319,6 +319,142 @@
     margin-bottom: 0;
 }
 
+/* === FILTROS INTERATIVOS === */
+.kombo-filters-wrapper {
+    background-color: #F5F5F5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid #E5E5E5;
+}
+
+.kombo-filters-container {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin-bottom: 12px;
+}
+
+.kombo-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.kombo-filter-field label {
+    color: #333333;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.kombo-filter-input,
+.kombo-filter-location,
+.kombo-filter-area {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    color: #333333;
+    background-color: #FFFFFF;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kombo-filter-input:hover,
+.kombo-filter-location:hover,
+.kombo-filter-area:hover {
+    border-color: #8B1818;
+}
+
+.kombo-filter-input:focus,
+.kombo-filter-location:focus,
+.kombo-filter-area:focus {
+    outline: none;
+    border-color: #8B1818;
+    box-shadow: 0 0 0 3px rgba(139, 24, 24, 0.1);
+}
+
+.kombo-filter-reset {
+    background-color: #8B1818;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    white-space: nowrap;
+}
+
+.kombo-filter-reset:hover {
+    background-color: #6B0F0F;
+}
+
+.kombo-filter-reset:focus {
+    outline: 2px solid #8B1818;
+    outline-offset: 2px;
+}
+
+.kombo-filter-reset:active {
+    transform: scale(0.98);
+}
+
+.kombo-filter-results {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #E5E5E5;
+}
+
+.kombo-filter-count {
+    color: #666666;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Itens filtrados (escondidos) */
+.kombo-vaga-card[hidden],
+.kombo-vaga-item[hidden],
+.kombo-accordion-item[hidden] {
+    display: none;
+}
+
+.kombo-vaga-card[aria-hidden="true"],
+.kombo-vaga-item[aria-hidden="true"],
+.kombo-accordion-item[aria-hidden="true"] {
+    display: none;
+}
+
+/* Filtros responsivos */
+@media (max-width: 768px) {
+    .kombo-filters-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .kombo-filter-field {
+        min-width: 100%;
+    }
+
+    .kombo-filter-reset {
+        width: 100%;
+    }
+
+    .kombo-filter-results {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+}
+
 /* === ESTADOS DE ERRO E VAZIO === */
 .kombo-vagas-error,
 .kombo-vagas-empty {
