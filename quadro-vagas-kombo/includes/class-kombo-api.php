@@ -130,6 +130,9 @@ class Kombo_API {
         // Suprime erros XML para tratamento manual
         libxml_use_internal_errors( true );
 
+        // Corrige encoding - converte para UTF-8 se necessario
+        $xml_content = $this->fix_encoding( $xml_content );
+
         // Tenta carregar como SimpleXML
         $xml = simplexml_load_string( $xml_content, 'SimpleXMLElement', LIBXML_NOCDATA );
 
@@ -174,7 +177,10 @@ class Kombo_API {
      */
     private function parse_vaga_item( $item ) {
         // Extrai dados com fallbacks para diferentes estruturas XML possiveis
-        $titulo = $this->get_xml_value( $item, array( 'title', 'titulo', 'vaga', 'cargo' ) );
+        $titulo_raw = $this->get_xml_value( $item, array( 'title', 'titulo', 'vaga', 'cargo' ) );
+
+        // Limpa HTML e corrige encoding do titulo
+        $titulo = $this->clean_html( $titulo_raw );
 
         // Valida campos obrigatorios
         if ( empty( $titulo ) ) {
@@ -182,10 +188,13 @@ class Kombo_API {
         }
 
         // Extrai descricao que pode conter informacoes adicionais
-        $descricao = $this->get_xml_value( $item, array( 'description', 'descricao' ) );
+        $descricao_raw = $this->get_xml_value( $item, array( 'description', 'descricao' ) );
 
         // Tenta extrair informacoes da descricao
-        $parsed_info = $this->parse_description( $descricao );
+        $parsed_info = $this->parse_description( $descricao_raw );
+
+        // Limpa descricao para exibicao
+        $descricao_limpa = $this->clean_html( $descricao_raw );
 
         $vaga = array(
             'codigo'         => $this->get_xml_value( $item, array( 'codigo', 'code', 'id', 'guid' ) ),
@@ -196,7 +205,7 @@ class Kombo_API {
             'num_vagas'      => ! empty( $parsed_info['num_vagas'] ) ? (int) $parsed_info['num_vagas'] : (int) $this->get_xml_value( $item, array( 'num_vagas', 'vagas', 'quantidade', 'qty' ) ),
             'data_abertura'  => $this->get_xml_value( $item, array( 'pubDate', 'data_abertura', 'data', 'date' ) ),
             'link'           => $this->get_xml_value( $item, array( 'link', 'url' ) ),
-            'descricao'      => $descricao,
+            'descricao'      => $descricao_limpa,
         );
 
         // Formata localizacao (cidade/estado)
@@ -229,6 +238,53 @@ class Kombo_API {
     }
 
     /**
+     * Corrige encoding do conteudo XML para UTF-8
+     *
+     * @param string $content Conteudo XML
+     * @return string Conteudo com encoding corrigido
+     */
+    private function fix_encoding( $content ) {
+        // Detecta encoding atual
+        $encoding = mb_detect_encoding( $content, array( 'UTF-8', 'ISO-8859-1', 'Windows-1252' ), true );
+
+        // Se nao for UTF-8, converte
+        if ( $encoding && $encoding !== 'UTF-8' ) {
+            $content = mb_convert_encoding( $content, 'UTF-8', $encoding );
+        }
+
+        // Remove BOM se existir
+        $content = preg_replace( '/^\xEF\xBB\xBF/', '', $content );
+
+        // Corrige declaracao de encoding no XML
+        $content = preg_replace( '/encoding=["\'](?:ISO-8859-1|Windows-1252|iso-8859-1)["\']/', 'encoding="UTF-8"', $content );
+
+        return $content;
+    }
+
+    /**
+     * Limpa HTML e converte para texto plano
+     *
+     * @param string $html Conteudo HTML
+     * @return string Texto limpo
+     */
+    private function clean_html( $html ) {
+        // Converte <br> para quebra de linha
+        $text = preg_replace( '/<br\s*\/?>/i', "\n", $html );
+
+        // Remove todas as tags HTML
+        $text = strip_tags( $text );
+
+        // Decodifica entidades HTML
+        $text = html_entity_decode( $text, ENT_QUOTES, 'UTF-8' );
+
+        // Remove espacos extras e quebras de linha multiplas
+        $text = preg_replace( '/[ \t]+/', ' ', $text );
+        $text = preg_replace( '/\n\s*\n/', "\n", $text );
+
+        return trim( $text );
+    }
+
+    /**
      * Extrai informacoes da descricao da vaga
      *
      * O feed Kombo pode incluir informacoes formatadas na descricao como:
@@ -252,6 +308,9 @@ class Kombo_API {
         if ( empty( $description ) ) {
             return $info;
         }
+
+        // Limpa HTML antes de processar
+        $description = $this->clean_html( $description );
 
         // Extrai Cidade/UF
         if ( preg_match( '/Cidade\/UF:\s*([^\/\n]+)\/([A-Z]{2})/i', $description, $matches ) ) {

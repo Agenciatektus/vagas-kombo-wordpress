@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Quadro de Vagas Kombo
  * Plugin URI: https://valorh.com.br
- * Description: Exibe vagas de emprego do Kombo.com.br através de um widget Elementor personalizado.
+ * Description: Exibe vagas de emprego do Kombo.com.br atraves de um widget Elementor personalizado.
  * Version: 1.0.0
  * Author: ValorH Consultoria
  * Author URI: https://valorh.com.br

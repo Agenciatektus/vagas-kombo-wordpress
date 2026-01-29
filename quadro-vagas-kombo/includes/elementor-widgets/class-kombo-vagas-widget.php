@@ -93,6 +93,7 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
     protected function register_controls(): void {
         $this->register_content_controls();
         $this->register_display_controls();
+        $this->register_filter_controls();
         $this->register_button_controls();
         $this->register_advanced_controls();
         $this->register_style_card_controls();
@@ -122,8 +123,8 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
             array(
                 'label'       => esc_html__( 'CID Kombo', 'quadro-vagas-kombo' ),
                 'type'        => \Elementor\Controls_Manager::TEXT,
-                'default'     => 'NDIzMS0w',
-                'placeholder' => esc_html__( 'Ex: NDIzMS0w', 'quadro-vagas-kombo' ),
+                'default'     => '',
+                'placeholder' => esc_html__( 'Ex: ABC123XYZ', 'quadro-vagas-kombo' ),
                 'description' => esc_html__( 'Codigo do cliente Kombo (encontrado em Dados Cadastrais)', 'quadro-vagas-kombo' ),
                 'label_block' => true,
             )
@@ -259,6 +260,73 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
     }
 
     /**
+     * Registra controles de filtros
+     *
+     * @return void
+     */
+    private function register_filter_controls(): void {
+        $this->start_controls_section(
+            'section_filters',
+            array(
+                'label' => esc_html__( 'Filtros', 'quadro-vagas-kombo' ),
+                'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
+            )
+        );
+
+        // Filtrar por localidade
+        $this->add_control(
+            'filter_location',
+            array(
+                'label'       => esc_html__( 'Filtrar por Localizacao', 'quadro-vagas-kombo' ),
+                'type'        => \Elementor\Controls_Manager::TEXT,
+                'default'     => '',
+                'placeholder' => esc_html__( 'Ex: Salvador, Sao Paulo/SP', 'quadro-vagas-kombo' ),
+                'description' => esc_html__( 'Deixe vazio para exibir todas. Pode usar cidade ou cidade/UF', 'quadro-vagas-kombo' ),
+                'label_block' => true,
+            )
+        );
+
+        // Filtrar por ramo/categoria
+        $this->add_control(
+            'filter_category',
+            array(
+                'label'       => esc_html__( 'Filtrar por Ramo/Area', 'quadro-vagas-kombo' ),
+                'type'        => \Elementor\Controls_Manager::TEXT,
+                'default'     => '',
+                'placeholder' => esc_html__( 'Ex: Recursos Humanos', 'quadro-vagas-kombo' ),
+                'description' => esc_html__( 'Deixe vazio para exibir todas', 'quadro-vagas-kombo' ),
+                'label_block' => true,
+            )
+        );
+
+        // Filtrar por numero minimo de vagas
+        $this->add_control(
+            'filter_min_positions',
+            array(
+                'label'       => esc_html__( 'Numero Minimo de Vagas', 'quadro-vagas-kombo' ),
+                'type'        => \Elementor\Controls_Manager::NUMBER,
+                'default'     => 0,
+                'min'         => 0,
+                'description' => esc_html__( '0 = sem filtro', 'quadro-vagas-kombo' ),
+            )
+        );
+
+        // Filtrar por data (ultimos X dias)
+        $this->add_control(
+            'filter_days',
+            array(
+                'label'       => esc_html__( 'Vagas dos Ultimos (dias)', 'quadro-vagas-kombo' ),
+                'type'        => \Elementor\Controls_Manager::NUMBER,
+                'default'     => 0,
+                'min'         => 0,
+                'description' => esc_html__( '0 = sem filtro. Ex: 30 para ultimos 30 dias', 'quadro-vagas-kombo' ),
+            )
+        );
+
+        $this->end_controls_section();
+    }
+
+    /**
      * Registra controles do botao
      *
      * @return void
@@ -374,6 +442,39 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
                 'default'   => '#FFFFFF',
                 'selectors' => array(
                     '{{WRAPPER}} .kombo-vaga-card, {{WRAPPER}} .kombo-vaga-item, {{WRAPPER}} .kombo-accordion-item' => 'background-color: {{VALUE}};',
+                ),
+            )
+        );
+
+        // Espessura da borda
+        $this->add_control(
+            'card_border_width',
+            array(
+                'label'      => esc_html__( 'Espessura da Borda', 'quadro-vagas-kombo' ),
+                'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => array( 'px' ),
+                'default'    => array(
+                    'top'    => '0',
+                    'right'  => '0',
+                    'bottom' => '0',
+                    'left'   => '0',
+                    'unit'   => 'px',
+                ),
+                'selectors'  => array(
+                    '{{WRAPPER}} .kombo-vaga-card, {{WRAPPER}} .kombo-vaga-item, {{WRAPPER}} .kombo-accordion-item' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}; border-style: solid;',
+                ),
+            )
+        );
+
+        // Cor da borda
+        $this->add_control(
+            'card_border_color',
+            array(
+                'label'     => esc_html__( 'Cor da Borda', 'quadro-vagas-kombo' ),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'default'   => '#E0E0E0',
+                'selectors' => array(
+                    '{{WRAPPER}} .kombo-vaga-card, {{WRAPPER}} .kombo-vaga-item, {{WRAPPER}} .kombo-accordion-item' => 'border-color: {{VALUE}};',
                 ),
             )
         );
@@ -790,7 +891,10 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
             return;
         }
 
-        // Trata ausencia de vagas
+        // Aplica filtros
+        $vagas = $this->apply_filters( $vagas, $settings );
+
+        // Trata ausencia de vagas apos filtros
         if ( empty( $vagas ) ) {
             $this->render_no_jobs( $settings );
             return;
@@ -818,6 +922,74 @@ class Kombo_Vagas_Widget extends \Elementor\Widget_Base {
         }
 
         echo '</div>';
+    }
+
+    /**
+     * Aplica filtros nas vagas
+     *
+     * @param array $vagas    Array de vagas
+     * @param array $settings Configuracoes do widget
+     * @return array Vagas filtradas
+     */
+    private function apply_filters( $vagas, $settings ): array {
+        if ( empty( $vagas ) ) {
+            return $vagas;
+        }
+
+        $filtered = array();
+
+        foreach ( $vagas as $vaga ) {
+            // Filtro por localizacao
+            if ( ! empty( $settings['filter_location'] ) ) {
+                $filter_location = sanitize_text_field( $settings['filter_location'] );
+                $vaga_location   = ! empty( $vaga['localizacao'] ) ? $vaga['localizacao'] : '';
+
+                // Verifica se a localizacao da vaga contem o filtro (case-insensitive)
+                if ( stripos( $vaga_location, $filter_location ) === false ) {
+                    continue; // Pula esta vaga
+                }
+            }
+
+            // Filtro por ramo/categoria
+            if ( ! empty( $settings['filter_category'] ) ) {
+                $filter_category = sanitize_text_field( $settings['filter_category'] );
+                $vaga_category   = ! empty( $vaga['ramo_atividade'] ) ? $vaga['ramo_atividade'] : '';
+
+                // Verifica se o ramo da vaga contem o filtro (case-insensitive)
+                if ( stripos( $vaga_category, $filter_category ) === false ) {
+                    continue; // Pula esta vaga
+                }
+            }
+
+            // Filtro por numero minimo de vagas
+            if ( ! empty( $settings['filter_min_positions'] ) && $settings['filter_min_positions'] > 0 ) {
+                $min_positions = absint( $settings['filter_min_positions'] );
+                $vaga_positions = isset( $vaga['num_vagas'] ) ? absint( $vaga['num_vagas'] ) : 1;
+
+                if ( $vaga_positions < $min_positions ) {
+                    continue; // Pula esta vaga
+                }
+            }
+
+            // Filtro por data (ultimos X dias)
+            if ( ! empty( $settings['filter_days'] ) && $settings['filter_days'] > 0 ) {
+                $filter_days = absint( $settings['filter_days'] );
+
+                if ( ! empty( $vaga['data_abertura'] ) ) {
+                    $vaga_timestamp = strtotime( $vaga['data_abertura'] );
+                    $cutoff_date    = strtotime( '-' . $filter_days . ' days' );
+
+                    if ( $vaga_timestamp && $vaga_timestamp < $cutoff_date ) {
+                        continue; // Pula esta vaga
+                    }
+                }
+            }
+
+            // Se passou por todos os filtros, inclui na lista
+            $filtered[] = $vaga;
+        }
+
+        return $filtered;
     }
 
     /**
